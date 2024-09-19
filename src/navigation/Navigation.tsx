@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import RootStackNavigator from './RootStackNavigator';
 
 const Navigation = () => {
     return (
-        <View>
-            <Text>Navigation</Text>
-        </View>
-    )
+        <NavigationContainer>
+            <RootStackNavigator />
+        </NavigationContainer>
+    );
 }
 
 export default Navigation
