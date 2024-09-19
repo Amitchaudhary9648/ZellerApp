@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
-export const client = new ApolloClient({
+export const ApiClient = new ApolloClient({
     link: new HttpLink({
         uri: 'https://prrwjjssnvhpbcdwbcwx3nm3zm.appsync-api.ap-southeast-2.amazonaws.com/graphql',
         headers: {

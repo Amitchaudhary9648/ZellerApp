@@ -1,5 +1,5 @@
 //User Screens
-export const NAVIGATION_TO_USER_LIST_SCREEN = "UserList"
+export const NAVIGATION_TO_USER_LIST_SCREEN = "Users"
 
 //Home Screens
 export const NAVIGATION_TO_HOME_SCREEN = "Home"
