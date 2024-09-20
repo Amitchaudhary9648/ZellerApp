@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import React, { FC, useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -15,7 +15,6 @@ import { NAVIGATION_TO_HOME_SCREEN } from '../../navigations/routes';
 import CustomInput from '../../components/atomic/CustomInput';
 
 const UserScreen: FC = () => {
-
     const [allUsers, setAllUsers] = useState<any>([])
     const [nextToken, setNextToken] = useState<any>(null)
     const [loading, setLoading] = useState<boolean>(false)
@@ -36,15 +35,15 @@ const UserScreen: FC = () => {
             setLoading(true)
             const response = await ApiClient.query({
                 query: LIST_USERS,
-                variables: { limit: 10, nextToken: token },  // Adjust the limit as needed
+                variables: { limit: 10, nextToken: token },
             });
 
             const newCustomers = response.data.listZellerCustomers.items;
             const next = response.data.listZellerCustomers.nextToken;
 
-            setAllUsers((prev: any) => [...prev, ...newCustomers]);  // Append new data
+            setAllUsers((prev: any) => [...prev, ...newCustomers]);
             setNextToken(next);
-            setLoading(false)  // Set the nextToken for pagination if it exists
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching customers:', error);
         }
@@ -56,70 +55,92 @@ const UserScreen: FC = () => {
             setNextToken(0);
             const response = await ApiClient.query({
                 query: LIST_USERS,
-                variables: { limit: 10, nextToken: token },  // Adjust the limit as needed
+                variables: { limit: 10, nextToken: token },
             });
 
             const newCustomers = response.data.listZellerCustomers.items;
             const next = response.data.listZellerCustomers.nextToken;
-            setAllUsers(newCustomers); // Append new data
+            setAllUsers(newCustomers);
             setNextToken(next);
-            setRefreshing(false)  // Set the nextToken for pagination if it exists
+            setRefreshing(false);
         } catch (error) {
             console.error('Error fetching customers:', error);
         }
     };
 
     const renderUser = ({ item }: any) => {
-        console.log('item', item)
         return <UserCard name={item?.name} role={item?.role} activeUser={activeUser} userNameFilter={userName} />
     };
 
+    const renderHeader = () => (
+        <View>
+            <View style={styles.imgContainer}>
+                <Image source={require('../../assets/images/Zeller-logo.png')} style={styles.imgStyles} />
+            </View>
+            <View style={styles.lineHorizontal} />
+            <CustomText variant='h2' style={styles.headingText}>User Types</CustomText>
+            <UserFilter isActive={activeUser == "Admin"} label={"Admin"} onClick={onFilterClick} />
+            <UserFilter isActive={activeUser == "Manager"} label={"Manager"} onClick={onFilterClick} />
+            <View style={[styles.lineHorizontal, { marginTop: 30 }]} />
+            <CustomText variant='h2' style={styles.headingText}>{activeUser} Users</CustomText>
+            <View style={styles.searchContainer}>
+                <CustomInput
+                    onChangeText={(text) => { setUserName(text) }}
+                    onClear={() => setUserName('')}
+                    value={userName}
+                    left={<Icon name={'search'} size={RFValue(20)} style={{ marginLeft: 10 }} />}
+                    placeholder='Search user'
+                    inputMode='text'
+                />
+            </View>
+        </View>
+    );
+
     return (
         <View style={styles.container}>
-            <KeyboardAvoidingView behavior="padding" style={styles.innerStyling}>
-                <ScrollView 
-                    nestedScrollEnabled={true}
-                    style={styles.scrollView} showsVerticalScrollIndicator={false}>
-                    <View >
-                        <View style={styles.imgContainer}>
-                            <Image source={require('../../assets/images/Zeller-logo.png')} style={styles.imgStyles} />
-                        </View>
-                        <View style={styles.lineHorizontal} />
-                        <CustomText variant='h2' style={styles.headingText}>User Types</CustomText>
-                        <UserFilter isActive={activeUser == "Admin"} label={"Admin"} onClick={onFilterClick} />
-                        <UserFilter isActive={activeUser == "Manager"} label={"Manager"} onClick={onFilterClick} />
-                        <View style={[styles.lineHorizontal, { marginTop: 30 }]} />
-                        <CustomText variant='h2' style={styles.headingText}>{activeUser} Users</CustomText>
-                        <View style={styles.searchContainer}>
-
-                            <CustomInput
-                                onChangeText={(text) => { setUserName(text) }}
-                                onClear={() => setUserName('')}
-                                value={userName}
-                                left={<Icon name={'search'} size={RFValue(20)} style={{ marginLeft: 10 }} />}
-                                placeholder='Search user'
-                                inputMode='text'
-                            />
-                        </View>
-                        {loading ? (
-                            <ActivityIndicator size={'small'} color={Colors.primary_light} />
-                        ) : (
-                            <FlatList
-                                data={allUsers}
-                                keyExtractor={(item) => item.id}
-                                renderItem={renderUser}
-                                nestedScrollEnabled={true}
-                                style={styles.flatListStyle}  // Assigning fixed height
-                                refreshControl={
-                                    <RefreshControl refreshing={refreshing} onRefresh={refreshUser} />
-                                }
-                                ListFooterComponent={nextToken && (
-                                    <Text style={styles.loadMoreText} onPress={() => fetchCustomers(nextToken)}>Load more</Text>
-                                )}
-                            />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                style={styles.innerStyling}
+            >
+                {loading ? (
+                    <ActivityIndicator size={'small'} color={Colors.primary_light} />
+                ) : (
+                    <FlatList
+                        data={allUsers}
+                        keyExtractor={(item) => item.id}
+                        showsVerticalScrollIndicator={false}
+                        renderItem={renderUser}
+                        ListHeaderComponent={
+                            <>
+                                <View style={styles.imgContainer}>
+                                    <Image source={require('../../assets/images/Zeller-logo.png')} style={styles.imgStyles} />
+                                </View>
+                                <View style={styles.lineHorizontal} />
+                                <CustomText variant='h2' style={styles.headingText}>User Types</CustomText>
+                                <UserFilter isActive={activeUser == "Admin"} label={"Admin"} onClick={onFilterClick} />
+                                <UserFilter isActive={activeUser == "Manager"} label={"Manager"} onClick={onFilterClick} />
+                                <View style={[styles.lineHorizontal, { marginTop: 30 }]} />
+                                <CustomText variant='h2' style={styles.headingText}>{activeUser} Users</CustomText>
+                                <View style={styles.searchContainer}>
+                                    <CustomInput
+                                        onChangeText={(text) => { setUserName(text) }}
+                                        onClear={() => setUserName('')}
+                                        value={userName}
+                                        left={<Icon name={'search'} size={RFValue(20)} style={{ marginLeft: 10 }} />}
+                                        placeholder='Search user'
+                                        inputMode='text'
+                                    />
+                                </View>
+                            </>
+                        }
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={refreshUser} />
+                        }
+                        ListFooterComponent={nextToken && (
+                            <Text style={styles.loadMoreText} onPress={() => fetchCustomers(nextToken)}>Load more</Text>
                         )}
-                    </View>
-                </ScrollView>
+                    />
+                )}
             </KeyboardAvoidingView>
             <View style={styles.buttonStyle}>
                 <CustomButton title='Go to home' onPress={() => navigate(NAVIGATION_TO_HOME_SCREEN)} />
@@ -135,48 +156,41 @@ const styles = StyleSheet.create({
     },
     innerStyling: {
         marginHorizontal: 20,
-        flex: 1,  // Ensures that the inner container takes up the full height
-    },
-    scrollView: {
-        flex: 1,// Allow scrolling
+        flex: 1,
     },
     imgContainer: {
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     imgStyles: {
         width: 100,
-        height: 70
+        height: 70,
     },
     lineHorizontal: {
         width: '100%',
         height: 1,
         backgroundColor: Colors.border,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     headingText: {
         marginTop: 20,
         color: Colors.secondary,
-        marginBottom: 20
-    },
-    flatListStyle: {
-        height: 300,
-        marginBottom: 60,
+        marginBottom: 20,
     },
     loadMoreText: {
-        textAlign: 'center'
+        textAlign: 'center',
     },
     buttonStyle: {
         position: 'absolute',
-        bottom: Platform.OS == 'android' ? 0 : 5,
+        bottom: Platform.OS === 'android' ? 0 : 5,
         width: '92%',
         left: 15,
-        right: 15
+        right: 15,
     },
     searchContainer: {
-        marginBottom: 10
-    }
+        marginBottom: 10,
+    },
 });
 
 export default UserScreen;
