@@ -37,7 +37,7 @@ const HomeScreen = () => {
                     fontFamily={Fonts.SemiBold}
                     fontSize={RFValue(25)}
                     style={styles.bottomText}
-                    >Replace your traditional business bank with Zeller</CustomText>
+                    >Replace your traditional business bank with Zeller.</CustomText>
             </View>
         </View>
     )
