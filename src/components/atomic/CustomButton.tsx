@@ -6,8 +6,8 @@ import CustomText from "./CustomText"
 interface CustomButtonProps {
     onPress: () => void
     title: string
-    disabled: boolean
-    loading: boolean
+    disabled?: boolean
+    loading?: boolean
 }
 
 const CustomButton : FC<CustomButtonProps> = ({
@@ -26,7 +26,7 @@ const CustomButton : FC<CustomButtonProps> = ({
             }]}>
             {loading ? 
                 <ActivityIndicator color={'white'} size={'small'}/> :
-                <CustomText variant="h6" style={styles.text} fontFamily={Fonts.SemiBold}>
+                <CustomText variant="h4" style={styles.text} fontFamily={Fonts.SemiBold}>
                     {title}
                 </CustomText>}
         </TouchableOpacity>
